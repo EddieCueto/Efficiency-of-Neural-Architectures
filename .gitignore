@@ -1,0 +1,9 @@
+__pycache__/
+checkpoints/
+data/
+data_budget/
+experiment-power-draw/
+**/__pycache__/
+**/__init__.py
+**/**/__pycache__/
+**/**/__init__.py
