@@ -1,4 +1,6 @@
 ############### Configuration file for Bayesian ###############
+
+import os
 layer_type = 'lrt'  # 'bbb' or 'lrt'
 activation_type = 'softplus'  # 'softplus' or 'relu'
 priors={
@@ -16,4 +18,25 @@ batch_size = 256
 train_ens = 1
 valid_ens = 1
 beta_type = 0.1  # 'Blundell', 'Standard', etc. Use float for const value
-wide = 1
+
+
+with open("bay", "r") as file:
+    bay = int(file.read())
+
+if bay == 1:
+    with open("tmp", "r") as file:
+        wide = int(file.read())
+
+    if os.path.exists("tmp"):
+        os.remove("tmp")
+    else:
+        raise Exception("Tmp file not found")
+
+    print("Bayesian configured to run with width: {}".format(wide))
+
+
+if os.path.exists("bay"):
+    os.remove("bay")
+else:
+    raise Exception("Bay file not found")
+    

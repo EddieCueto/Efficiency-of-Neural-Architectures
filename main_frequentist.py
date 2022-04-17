@@ -103,16 +103,16 @@ def run(dataset, net_type):
 
         #early_stop.append(valid_acc)
         #if epoch % 4 == 0 and epoch > 0:
-            #print("Value 1: {} >= {}, Value 2: {} >= {}, Value 2: {} >= {}".format(early_stop[0],valid_acc-thrs,early_stop[1],valid_acc-thrs,early_stop[2],valid_acc-thrs))
-            #if abs(early_stop[0]) >= valid_acc-thrs and abs(early_stop[1]) >= valid_acc-thrs and abs(early_stop[2]) >= valid_acc-thrs:
-                #break
-            #early_stop = []
+        #    print("Value 1: {} >= {}, Value 2: {} >= {}, Value 2: {} >= {}".format(early_stop[0],valid_acc-thrs,early_stop[1],valid_acc-thrs,early_stop[2],valid_acc-thrs))
+        #    if abs(early_stop[0]) >= valid_acc-thrs and abs(early_stop[1]) >= valid_acc-thrs and abs(early_stop[2]) >= valid_acc-thrs:
+        #        break
+        #    early_stop = []
 
-        if train_acc >= 0.99:
-            break
+        #if train_acc >= 0.99:
+        #    break
 
         #if gpu_sample_draw.total_watt_consumed() > 100000:
-            #break
+        #    break
 
         # save model when finished
         #if epoch == n_epochs:
