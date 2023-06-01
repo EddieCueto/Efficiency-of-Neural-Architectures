@@ -2,6 +2,9 @@
 
 import os
 n_epochs = 100
+sens = 1e-9
+energy_thrs = 100000
+acc_thrs = 0.99
 lr = 0.001
 num_workers = 4
 valid_size = 0.2
@@ -23,8 +26,7 @@ if frq == 1:
 
 
 
-if os.path.exists("frq"):
-    os.remove("frq")
-else:
-    raise Exception("Frq file not found")
-
+#if os.path.exists("frq"):
+#    os.remove("frq")
+#else:
+#    raise Exception("Frq file not found")

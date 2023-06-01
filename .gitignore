@@ -7,3 +7,12 @@ experiment-power-draw/
 **/__init__.py
 **/**/__pycache__/
 **/**/__init__.py
+stp
+sav
+bayes_*
+freq_*
+*.pkl
+bay
+frq
+sav
+tmp

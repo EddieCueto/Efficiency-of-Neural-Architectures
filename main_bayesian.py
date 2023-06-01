@@ -12,13 +12,14 @@ import config_bayesian as cfg
 from datetime import datetime
 from torch.nn import functional as F
 from torch.optim import Adam, lr_scheduler
-import gpu_sample_draw
+import amd_sample_draw
 from models.BayesianModels.BayesianLeNet import BBBLeNet
 from models.BayesianModels.BayesianAlexNet import BBBAlexNet
 from models.BayesianModels.Bayesian3Conv3FC import BBB3Conv3FC
+from stopping_crit import earlyStopping, energyBound, accuracyBound
 
 # CUDA settings
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 def getModel(net_type, inputs, outputs, priors, layer_type, activation_type):
     if (net_type == 'lenet'):
@@ -114,12 +115,17 @@ def run(dataset, net_type):
     if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir, exist_ok=True)
 
+    with open("stp", "r") as file:
+        stp = int(file.read())
+    with open("sav", "r") as file:
+        sav = int(file.read())
+
     criterion = metrics.ELBO(len(trainset)).to(device)
     optimizer = Adam(net.parameters(), lr=lr_start)
     lr_sched = lr_scheduler.ReduceLROnPlateau(optimizer, patience=6, verbose=True)
     #valid_loss_max = np.Inf
-    #early_stop = []
-    #thrs=1e-9
+    if stp == 2:
+        early_stop = []
     train_data = []
     for epoch in range(n_epochs):  # loop over the dataset multiple times
 
@@ -132,22 +138,25 @@ def run(dataset, net_type):
         print('Epoch: {} \tTraining Loss: {:.4f} \tTraining Accuracy: {:.4f} \tValidation Loss: {:.4f} \tValidation Accuracy: {:.4f} \ttrain_kl_div: {:.4f}'.format(
             epoch, train_loss, train_acc, valid_loss, valid_acc, train_kl))
 
-        #early_stop.append(valid_acc)
-        #if epoch % 4 == 0 and epoch > 0:
-            #print("Value 1: {} >= {}, Value 2: {} >= {}, Value 2: {} >= {}".format(early_stop[0],valid_acc-thrs,early_stop[1],valid_acc-thrs,early_stop[2],valid_acc-thrs))
-            #if abs(early_stop[0]) >= valid_acc-thrs and abs(early_stop[1]) >= valid_acc-thrs and abs(early_stop[2]) >= valid_acc-thrs:
-                #break
-            #early_stop = []
+        if stp == 2:
+            print('Using early stopping')
+            if earlyStopping(early_stop,train_acc,cfg.sens) == None:
+                break
+        elif stp == 3: 
+            print('Using energy bound')
+            if energyBound(cfg.energy_thrs) == None:
+                break
+        elif stp == 4:
+            print('Using accuracy bound')
+            if accuracyBound(cfg.acc_thrs) == None:
+                break
+        else:
+            print('Training for {} epochs'.format(cfg.n_epochs))
 
-        if train_acc >= 0.50:
-            break
-
-        #if gpu_sample_draw.total_watt_consumed() > 100000:
-            #break
-
-        # save model on last epoch
-        #if epoch == (n_epochs-1):
-            #torch.save(net.state_dict(), ckpt_name)
+        if sav == 1:
+            # save model when finished
+            if epoch == n_epochs:
+                torch.save(net.state_dict(), ckpt_name)
 
     with open("bayes_exp_data_"+str(cfg.wide)+".pkl", 'wb') as f:
       pickle.dump(train_data, f)
