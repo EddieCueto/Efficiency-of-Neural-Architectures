@@ -61,12 +61,16 @@ def get_sample_of_gpu():
            #return temp
 
 def total_watt_consumed():
-    with open(pickle_name, 'rb') as f:
-        x = pickle.load(f)
-    x = np.array(x)
-    x = x[:,0]
-    y = [int(re.findall("\d+",xi)[0]) for xi in x]
-    return sum(y)
+  with (open(pickle_name, "rb")) as file:
+      while True:
+          try:
+              x = pickle.load(file)
+          except EOFError:
+              break
+  x = np.array(x)
+  x = x[:,0]
+  y = [float(re.findall("\d+.\d+",xi)[0]) for xi in x]
+  return sum(y)
 
 if __name__ == '__main__':
   dataDump = []

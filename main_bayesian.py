@@ -8,11 +8,11 @@ import pickle
 import metrics
 import argparse
 import numpy as np
+import amd_sample_draw
 import config_bayesian as cfg
 from datetime import datetime
 from torch.nn import functional as F
 from torch.optim import Adam, lr_scheduler
-import amd_sample_draw
 from models.BayesianModels.BayesianLeNet import BBBLeNet
 from models.BayesianModels.BayesianAlexNet import BBBAlexNet
 from models.BayesianModels.Bayesian3Conv3FC import BBB3Conv3FC
@@ -124,8 +124,8 @@ def run(dataset, net_type):
     optimizer = Adam(net.parameters(), lr=lr_start)
     lr_sched = lr_scheduler.ReduceLROnPlateau(optimizer, patience=6, verbose=True)
     #valid_loss_max = np.Inf
-    if stp == 2:
-        early_stop = []
+    #if stp == 2:
+    early_stop = []
     train_data = []
     for epoch in range(n_epochs):  # loop over the dataset multiple times
 
@@ -139,24 +139,25 @@ def run(dataset, net_type):
             epoch, train_loss, train_acc, valid_loss, valid_acc, train_kl))
 
         if stp == 2:
-            print('Using early stopping')
-            if earlyStopping(early_stop,train_acc,cfg.sens) == None:
+            #print('Using early stopping')
+            if earlyStopping(early_stop,train_acc,epoch,cfg.sens) == 1:
                 break
         elif stp == 3: 
-            print('Using energy bound')
-            if energyBound(cfg.energy_thrs) == None:
+            #print('Using energy bound')
+            if energyBound(cfg.energy_thrs) == 1:
                 break
         elif stp == 4:
-            print('Using accuracy bound')
-            if accuracyBound(cfg.acc_thrs) == None:
+            #print('Using accuracy bound')
+            if accuracyBound(cfg.acc_thrs) == 1:
                 break
         else:
             print('Training for {} epochs'.format(cfg.n_epochs))
 
         if sav == 1:
             # save model when finished
-            if epoch == n_epochs:
+            if epoch == cfg.n_epochs-1:
                 torch.save(net.state_dict(), ckpt_name)
+
 
     with open("bayes_exp_data_"+str(cfg.wide)+".pkl", 'wb') as f:
       pickle.dump(train_data, f)

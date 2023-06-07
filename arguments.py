@@ -7,9 +7,9 @@ all_args = argparse.ArgumentParser()
 
 def makeArguments(arguments: ArgumentParser) -> dict:
     all_args.add_argument("-b", "--Bayesian", action="store", dest="b",
-       type=int, choices=range(1,7), help="Bayesian model of size x")
+       type=int, choices=range(1,8), help="Bayesian model of size x")
     all_args.add_argument("-f", "--Frequentist", action="store", dest="f",
-       type=int, choices=range(1,7), help="Frequentist model of size x")
+       type=int, choices=range(1,8), help="Frequentist model of size x")
     all_args.add_argument("-E", "--EarlyStopping", action="store_true",
     help="Early Stopping criteria")
     all_args.add_argument("-e", "--EnergyBound", action="store_true",

@@ -90,8 +90,8 @@ def run(dataset, net_type):
     optimizer = Adam(net.parameters(), lr=lr)
     lr_sched = lr_scheduler.ReduceLROnPlateau(optimizer, patience=6, verbose=True)
     #valid_loss_min = np.Inf
-    if stp == 2:
-        early_stop = []
+    #if stp == 2:
+    early_stop = []
     train_data = []
     for epoch in range(1, n_epochs+1):
 
@@ -107,14 +107,17 @@ def run(dataset, net_type):
             epoch, train_loss, train_acc, valid_loss, valid_acc))
         
         if stp == 2:
-            print('Using early stopping')
-            earlyStopping(early_stop,train_acc,cfg.sens)
+            #print('Using early stopping')
+            if earlyStopping(early_stop,valid_acc,epoch,cfg.sens) == 1:
+                break
         elif stp == 3: 
-            print('Using energy bound')
-            energyBound(cfg.energy_thrs)
+            #print('Using energy bound')
+            if energyBound(cfg.energy_thrs) == 1:
+                break
         elif stp == 4:
-            print('Using accuracy bound')
-            accuracyBound(cfg.acc_thrs)
+            #print('Using accuracy bound')
+            if accuracyBound(train_acc,0.70) == 1:
+                break
         else:
             print('Training for {} epochs'.format(cfg.n_epochs))
 
@@ -133,7 +136,7 @@ if __name__ == '__main__':
     print("Initial Time =", current_time)
     parser = argparse.ArgumentParser(description = "PyTorch Frequentist Model Training")
     parser.add_argument('--net_type', default='lenet', type=str, help='model')
-    parser.add_argument('--dataset', default='MNIST', type=str, help='dataset = [MNIST/CIFAR10/CIFAR100]')
+    parser.add_argument('--dataset', default='CIFAR10', type=str, help='dataset = [MNIST/CIFAR10/CIFAR100]')
     args = parser.parse_args()
     run(args.dataset, args.net_type)
     now = datetime.now()

@@ -3,7 +3,7 @@
 import os
 n_epochs = 100
 sens = 1e-9
-energy_thrs = 100000
+energy_thrs = 10000
 acc_thrs = 0.99
 lr = 0.001
 num_workers = 4
