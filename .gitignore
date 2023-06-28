@@ -13,6 +13,7 @@ bayes_*
 times_*
 freq_*
 *.pkl
+*.txt
 bay
 frq
 sav

@@ -3,9 +3,6 @@ import torch
 import numpy as np
 from torch.nn import functional as F
 
-import config_bayesian as cfg
-
-
 # cifar10 classes
 cifar10_classes = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                    'dog', 'frog', 'horse', 'ship', 'truck']

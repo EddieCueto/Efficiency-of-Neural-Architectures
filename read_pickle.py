@@ -1,7 +1,7 @@
 import pickle
 
 gpu_data = []
-with (open("freq_wattdata_1.0.pkl", "rb")) as openfile:
+with (open("bayesian_wattdata_3.pkl", "rb")) as openfile:
     while True:
         try:
             gpu_data = pickle.load(openfile)

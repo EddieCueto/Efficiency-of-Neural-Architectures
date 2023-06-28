@@ -17,4 +17,6 @@ def makeArguments(arguments: ArgumentParser) -> dict:
     all_args.add_argument("-a", "--AccuracyBound", action="store_true",
     help="Accuracy Bound criteria")
     all_args.add_argument("-s", "--Save", action="store_true", help="Save model")
+    all_args.add_argument('--net_type', default='lenet', type=str, help='model = [lenet/AlexNet/3Conv3FC]')
+    all_args.add_argument('--dataset', default='CIFAR10', type=str, help='dataset = [MNIST/CIFAR10/CIFAR100]')
     return vars(all_args.parse_args())

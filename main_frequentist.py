@@ -116,7 +116,7 @@ def run(dataset, net_type):
                 break
         elif stp == 4:
             #print('Using accuracy bound')
-            if accuracyBound(train_acc,0.70) == 1:
+            if accuracyBound(train_acc,cfg.acc_thrs) == 1:
                 break
         else:
             print('Training for {} epochs'.format(cfg.n_epochs))
@@ -136,7 +136,7 @@ if __name__ == '__main__':
     print("Initial Time =", current_time)
     parser = argparse.ArgumentParser(description = "PyTorch Frequentist Model Training")
     parser.add_argument('--net_type', default='lenet', type=str, help='model')
-    parser.add_argument('--dataset', default='CIFAR10', type=str, help='dataset = [MNIST/CIFAR10/CIFAR100]')
+    parser.add_argument('--dataset', default='MNIST', type=str, help='dataset = [MNIST/CIFAR10/CIFAR100]')
     args = parser.parse_args()
     run(args.dataset, args.net_type)
     now = datetime.now()

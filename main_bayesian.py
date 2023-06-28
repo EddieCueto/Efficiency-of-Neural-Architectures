@@ -6,24 +6,30 @@ import utils
 import torch
 import pickle
 import metrics
-import argparse
 import numpy as np
-import amd_sample_draw
-import config_bayesian as cfg
 from datetime import datetime
 from torch.nn import functional as F
 from torch.optim import Adam, lr_scheduler
+from gpu_power_func import total_watt_consumed
 from models.BayesianModels.BayesianLeNet import BBBLeNet
 from models.BayesianModels.BayesianAlexNet import BBBAlexNet
 from models.BayesianModels.Bayesian3Conv3FC import BBB3Conv3FC
 from stopping_crit import earlyStopping, energyBound, accuracyBound
+
+with (open("configuration.pkl", "rb")) as file:
+    while True:
+        try:
+            cfg = pickle.load(file)
+        except EOFError:
+            break
+
 
 # CUDA settings
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 def getModel(net_type, inputs, outputs, priors, layer_type, activation_type):
     if (net_type == 'lenet'):
-        return BBBLeNet(outputs, inputs, priors, layer_type, activation_type,wide=cfg.wide)
+        return BBBLeNet(outputs, inputs, priors, layer_type, activation_type,wide=cfg["model"]["size"])
     elif (net_type == 'alexnet'):
         return BBBAlexNet(outputs, inputs, priors, layer_type, activation_type)
     elif (net_type == '3conv3fc'):
@@ -91,18 +97,18 @@ def validate_model(net, criterion, validloader, num_ens=1, beta_type=0.1, epoch=
 def run(dataset, net_type):
 
     # Hyper Parameter settings
-    layer_type = cfg.layer_type
-    activation_type = cfg.activation_type
-    priors = cfg.priors
+    layer_type = cfg["model"]["layer_type"]
+    activation_type = cfg["model"]["activation_type"]
+    priors = cfg["model"]["priors"]
 
-    train_ens = cfg.train_ens
-    valid_ens = cfg.valid_ens
-    n_epochs = cfg.n_epochs
-    lr_start = cfg.lr_start
-    num_workers = cfg.num_workers
-    valid_size = cfg.valid_size
-    batch_size = cfg.batch_size
-    beta_type = cfg.beta_type
+    train_ens = cfg["model"]["train_ens"]
+    valid_ens = cfg["model"]["valid_ens"]
+    n_epochs = cfg["model"]["n_epochs"]
+    lr_start = cfg["model"]["lr"]
+    num_workers = cfg["model"]["num_workers"]
+    valid_size = cfg["model"]["valid_size"]
+    batch_size = cfg["model"]["batch_size"]
+    beta_type = cfg["model"]["beta_type"]
 
     trainset, testset, inputs, outputs = data.getDataset(dataset)
     train_loader, valid_loader, test_loader = data.getDataloader(
@@ -110,15 +116,13 @@ def run(dataset, net_type):
     net = getModel(net_type, inputs, outputs, priors, layer_type, activation_type).to(device)
 
     ckpt_dir = f'checkpoints/{dataset}/bayesian'
-    ckpt_name = f'checkpoints/{dataset}/bayesian/model_{net_type}_{layer_type}_{activation_type}_{cfg.wide}.pt'
+    ckpt_name = f'checkpoints/{dataset}/bayesian/model_{net_type}_{layer_type}_{activation_type}_{cfg["model"]["size"]}.pt'
 
     if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir, exist_ok=True)
 
-    with open("stp", "r") as file:
-        stp = int(file.read())
-    with open("sav", "r") as file:
-        sav = int(file.read())
+    stp = cfg["stopping_crit"]
+    sav = cfg["save"]
 
     criterion = metrics.ELBO(len(trainset)).to(device)
     optimizer = Adam(net.parameters(), lr=lr_start)
@@ -139,19 +143,19 @@ def run(dataset, net_type):
             epoch, train_loss, train_acc, valid_loss, valid_acc, train_kl))
 
         if stp == 2:
-            #print('Using early stopping')
-            if earlyStopping(early_stop,train_acc,epoch,cfg.sens) == 1:
+            print('Using early stopping')
+            if earlyStopping(early_stop,valid_acc,epoch,cfg["model"]["sens"]) == 1:
                 break
         elif stp == 3: 
-            #print('Using energy bound')
-            if energyBound(cfg.energy_thrs) == 1:
+            print('Using energy bound')
+            if energyBound(cfg["model"]["energy_thrs"]) == 1:
                 break
         elif stp == 4:
-            #print('Using accuracy bound')
-            if accuracyBound(cfg.acc_thrs) == 1:
+            print('Using accuracy bound')
+            if accuracyBound(train_acc,cfg.acc_thrs) == 1:
                 break
         else:
-            print('Training for {} epochs'.format(cfg.n_epochs))
+            print('Training for {} epochs'.format(cfg["model"]["n_epochs"]))
 
         if sav == 1:
             # save model when finished
@@ -159,18 +163,14 @@ def run(dataset, net_type):
                 torch.save(net.state_dict(), ckpt_name)
 
 
-    with open("bayes_exp_data_"+str(cfg.wide)+".pkl", 'wb') as f:
+    with open("bayes_exp_data_"+str(cfg["model"]["size"])+".pkl", 'wb') as f:
       pickle.dump(train_data, f)
 
 if __name__ == '__main__':
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     print("Initial Time =", current_time)
-    parser = argparse.ArgumentParser(description = "PyTorch Bayesian Model Training")
-    parser.add_argument('--net_type', default='lenet', type=str, help='model')
-    parser.add_argument('--dataset', default='CIFAR10', type=str, help='dataset = [MNIST/CIFAR10/CIFAR100]')
-    args = parser.parse_args()
-    run(args.dataset, args.net_type)
+    run(cfg["data"], cfg["model"]["net_type"])
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     print("Final Time =", current_time)
