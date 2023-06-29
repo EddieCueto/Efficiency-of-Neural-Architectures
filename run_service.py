@@ -60,34 +60,20 @@ cfg["model"]["size"] = wide
 cfg["data"] = args["dataset"]
 cfg["model"]["net_type"] = args["net_type"]
 
-#with open("tmp", "w") as file:
-#    file.write(str(wide))
 
 if args['EarlyStopping']:
     cfg["stopping_crit"] = 2
-    #with open("stp", "w") as file:
-    #    file.write('2')
 elif args['EnergyBound']:
     cfg["stopping_crit"] = 3
-    #with open("stp", "w") as file:
-    #    file.write('3')
 elif args['AccuracyBound']:
     cfg["stopping_crit"] = 4
-    #with open("stp", "w") as file:
-    #    file.write('4')
 else:
     cfg["stopping_crit"] = 1
-    #with open("stp", "w") as file:
-    #    file.write('1')
         
 if args['Save']:
     cfg["save"] = 1
-    #with open("sav", "w") as file:
-    #    file.write('1')
 else:
     cfg["save"] = 0
-    #with open("sav", "w") as file:
-    #    file.write('0')
     
 
 cfg["pickle_path"] = "{}_wattdata_{}.pkl".format(cfg["model"]["type"],cfg["model"]["size"])
@@ -96,7 +82,7 @@ with open("configuration.pkl", "wb") as f:
     pickle.dump(cfg, f)
 
 #print(args)
-print(cfg)
+#print(cfg)
 
 sleep(3)
 
@@ -105,18 +91,10 @@ if cmd[1] == "main_frequentist.py":
     cmd2 = ["./cpu_watt.sh", "freq_{}_cpu_watts".format(wide)]
     cmd3 = ["./mem_free.sh", "freq_{}_ram_use".format(wide)]
     cmd4 = ["./radeontop.sh", "freq_{}_flop_app".format(wide)]
-    #with open("frq", "w") as file:
-    #    file.write(str(1))
-    #with open("bay", "w") as file:
-    #    file.write(str(0))
 elif cmd[1] == "main_bayesian.py":
     cmd2 = ["./cpu_watt.sh", "bayes_{}_cpu_watts".format(wide)]
     cmd3 = ["./mem_free.sh", "bayes_{}_ram_use".format(wide)]
     cmd4 = ["./radeontop.sh", "bayes_{}_flop_app".format(wide)]
-    #with open("bay", "w") as file:
-    #    file.write(str(1))
-    #with open("frq", "w") as file:
-    #    file.write(str(0))
 
 
 path = sub.check_output(['pwd'])
@@ -126,18 +104,9 @@ path = path.replace('\n', '')
 startWattCounter = 'python ' + path + '/amd_sample_draw.py'
 
 
-#test = startNODE.split()
-#test.append(pythonEnd)
-#test.append(pythonEnd2)
-
-#startNODE = test
-
-#print(startNODE)
-#print(startWattCounter)
 
 p1 = sub.Popen(cmd)
-#p2 = sub.Popen(startWattCounter.split(),stdin=sub.PIPE,stdout=sub.PIPE, stderr=sub.PIPE)
-p2 = sub.Popen(startWattCounter.split())
+p2 = sub.Popen(startWattCounter.split(),stdin=sub.PIPE,stdout=sub.PIPE, stderr=sub.PIPE)
 p3 = sub.Popen(cmd2,stdin=sub.PIPE,stdout=sub.PIPE, stderr=sub.PIPE)
 p4 = sub.Popen(cmd3,stdin=sub.PIPE,stdout=sub.PIPE, stderr=sub.PIPE)
 p5 = sub.Popen(cmd4,stdin=sub.PIPE,stdout=sub.PIPE, stderr=sub.PIPE)
