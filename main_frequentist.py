@@ -143,7 +143,7 @@ if __name__ == '__main__':
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     print("Initial Time =", current_time)
-    run(cfg["model"]["data"], cfg["model"]["net_type"])
+    run(cfg["data"], cfg["model"]["net_type"])
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     print("Final Time =", current_time)
