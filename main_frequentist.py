@@ -21,7 +21,7 @@ with (open("configuration.pkl", "rb")) as file:
             break
 
 # CUDA settings
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def getModel(net_type, inputs, outputs, wide=cfg["model"]["size"]):
@@ -143,6 +143,7 @@ if __name__ == '__main__':
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     print("Initial Time =", current_time)
+    print("Using frequentist model of size: {}".format(cfg["model"]["size"]))
     run(cfg["data"], cfg["model"]["net_type"])
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")

@@ -2,7 +2,7 @@ import psutil
 import pickle
 import arguments
 from time import sleep
-from pathlib import Path
+#from pathlib import Path
 import subprocess as sub
 from arguments import makeArguments
 
@@ -94,22 +94,22 @@ cpu_watt = "cpu_watt.sh"
 ram = "mem_free.sh"
 gpu = "radeontop.sh"
 
-path_cpu_watt = Path(cpu_watt)
-path_ram = Path(ram)
-path_gpu = Path(gpu)
+#path_cpu_watt = Path(cpu_watt)
+#path_ram = Path(ram)
+#path_gpu = Path(gpu)
 
-path_cpu_watt = str(Path(cpu_watt).absolute()) + '/' + cpu_watt
-path_ram = str(Path(ram).absolute()) + '/' + ram
-path_gpu = str(Path(gpu).absolute()) + '/' + gpu
+#path_cpu_watt = str(Path(cpu_watt).absolute()) + '/' + cpu_watt
+#path_ram = str(Path(ram).absolute()) + '/' + ram
+#path_gpu = str(Path(gpu).absolute()) + '/' + gpu
 
 if cmd[1] == "main_frequentist.py":
-    cmd2 = [path_cpu_watt, "freq_{}_cpu_watts".format(wide)]
-    cmd3 = [path_ram, "freq_{}_ram_use".format(wide)]
-    cmd4 = [path_gpu, "freq_{}_flop_app".format(wide)]
+    cmd2 = ['./'+cpu_watt, "freq_{}_cpu_watts".format(wide)]
+    cmd3 = ['./'+ram, "freq_{}_ram_use".format(wide)]
+    cmd4 = ['./'+gpu, "freq_{}_flop_app".format(wide)]
 elif cmd[1] == "main_bayesian.py":
-    cmd2 = [path_cpu_watt, "bayes_{}_cpu_watts".format(wide)]
-    cmd3 = [path_ram, "bayes_{}_ram_use".format(wide)]
-    cmd4 = [path_gpu, "bayes_{}_flop_app".format(wide)]
+    cmd2 = ['./'+cpu_watt, "bayes_{}_cpu_watts".format(wide)]
+    cmd3 = ['./'+ram, "bayes_{}_ram_use".format(wide)]
+    cmd4 = ['./'+gpu, "bayes_{}_flop_app".format(wide)]
 
 
 path = sub.check_output(['pwd'])
